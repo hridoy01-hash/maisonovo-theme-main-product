@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order Dates Example</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+      }
+      h2 {
+        text-align: center;
+      }
+      .date-info {
+        margin: 10px 0;
+      }
+      .date-info span {
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Order Details</h2>
+
+      <div class="date-info">
+        <span>Ordered Date:</span> <span id="ordered-date"></span>
+      </div>
+
+      <div class="date-info">
+        <span>Shipped Date Range:</span> <span id="shipped-date"></span>
+      </div>
+
+      <div class="date-info delivery-date">
+        <span>Delivery Date Range:</span> <span></span>
+      </div>
+
+      <div class="date-info">
+        <span>Time Remaining Today:</span> <span id="seckill_time"></span>
+      </div>
+    </div>
+
+    <script>
+      // Function to format the date as "Dec 07"
+      function formatDate(date) {
+        const monthNames = [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
+        ];
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = monthNames[date.getMonth()];
+        return `${month} ${day}`;
+      }
+
+      // Function to calculate remaining time (from 24 hours today) in hours and minutes
+      function calculateTimeRemaining() {
+        const currentDate = new Date();
+
+        // Get the start of the day at 12:00 AM (midnight)
+        const orderStartTime = new Date(currentDate);
+        orderStartTime.setHours(0, 0, 0, 0); // Set time to 12:00 AM
+
+        // Get the current time of the day
+        const currentTime = new Date();
+
+        // Calculate the difference in milliseconds
+        const timeElapsed = currentTime - orderStartTime;
+
+        // Total time in 24 hours (in milliseconds)
+        const totalTime = 24 * 60 * 60 * 1000;
+
+        // Remaining time in milliseconds
+        const remainingTime = totalTime - timeElapsed;
+
+        // Convert remaining time to hours and minutes
+        const remainingHours = Math.floor(remainingTime / (1000 * 60 * 60)); // Hours
+        const remainingMinutes = Math.floor(
+          (remainingTime % (1000 * 60 * 60)) / (1000 * 60)
+        ); // Minutes
+
+        return `${remainingHours} hours ${remainingMinutes}`;
+      }
+
+      // Function to generate the order date information
+      function generateOrderDates() {
+        const currentDate = new Date();
+
+        // Ordered Date at 12:00 AM (start of the current day)
+        const orderedDate = new Date(currentDate.setHours(0, 0, 0, 0)); // Reset to 12:00 AM
+        const formattedOrderedDate = formatDate(new Date(orderedDate));
+
+        // Shipped Date: Order date + 3 or 5 days
+        const shippedDateStart = new Date(orderedDate);
+        shippedDateStart.setDate(orderedDate.getDate() + 3); // Add 3 days for the start of shipped date
+        const shippedDateEnd = new Date(shippedDateStart);
+        shippedDateEnd.setDate(shippedDateStart.getDate() + 2); // Add 2 more days for the end of shipped date
+        const shippedDateRange = `${formatDate(
+          shippedDateStart
+        )} - ${formatDate(shippedDateEnd)}`;
+
+        // Delivery Date: Order date + 10 days (delivery period example)
+        const deliveryDateStart = new Date(orderedDate);
+        deliveryDateStart.setDate(orderedDate.getDate() + 10); // 10 days after the ordered date
+        deliveryDateStart.setHours(23, 59, 59, 999); // Set to 11:59 PM (end of the day)
+
+        const deliveryDateEnd = new Date(deliveryDateStart);
+        deliveryDateEnd.setDate(deliveryDateStart.getDate() + 6); // Delivery ends 6 days later
+        const deliveryDateRange = `${formatDate(
+          deliveryDateStart
+        )} - ${formatDate(deliveryDateEnd)}`;
+
+        // Calculate remaining time until midnight (24-hour count)
+        const timeRemaining = calculateTimeRemaining();
+
+        // Display the dates in the HTML
+        document.getElementById(
+          "ordered-date"
+        ).textContent = `${formattedOrderedDate}`;
+        document.getElementById(
+          "shipped-date"
+        ).textContent = `${shippedDateRange}`;
+
+        // Update all elements with the class "delivery-date"
+        const deliveryElements = document.querySelectorAll(".delivery-date");
+        deliveryElements.forEach((element) => {
+          element.textContent = `${deliveryDateRange}`;
+        });
+
+        // Display the remaining time until midnight (24-hour basis)
+        document.getElementById(
+          "seckill_time"
+        ).textContent = `${timeRemaining}`;
+      }
+
+      // Call the function to generate the order dates
+      generateOrderDates();
+    </script>
+  </body>
+</html>
